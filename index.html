@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Top Corner Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0b0e16;--panel:#0e121c;--card:#121826;--line:#232a3d;--text:#eef1fa;--mute:#8a93ad;--gold:#f6c85f;
+        --sans:"Space Grotesk","Segoe UI",Tahoma,sans-serif;--mono:"JetBrains Mono",Consolas,monospace;color-scheme:dark}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden}
+  #app{display:grid;grid-template-columns:400px 1fr;height:100%}
+  aside{background:var(--panel);border-right:1px solid var(--line);padding:22px 20px;overflow:auto}
+  h1{font-size:32px;line-height:1.1;margin:0 0 12px;font-weight:700;letter-spacing:-.01em}
+  h1 span{color:var(--gold)}
+  .desc{color:var(--mute);font-size:14px;line-height:1.55;margin-bottom:22px}
+  .motto{margin-top:6px;font:700 20px var(--sans);color:var(--gold);letter-spacing:.01em}
+  .credit{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;line-height:1.7}
+  .credit b{color:var(--text);font-weight:500}
+  .credit a{color:var(--gold);text-decoration:none;font-weight:500}
+  .credit a:hover{text-decoration:underline}
+  .sec{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px}
+  .sec .t{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--mute)}
+  .pill{background:transparent;color:var(--gold);border:1px solid #6b5a2e;border-radius:20px;padding:7px 14px;font:500 13px var(--sans);cursor:pointer}
+  .pill:hover{background:#2a2412}
+  .pill:disabled{opacity:.35;cursor:not-allowed}
+  .ax{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+  .dot{width:20px;height:20px;border-radius:50%;background:var(--c);flex:none}
+  .ax input.name{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--text);font:500 16px var(--sans);padding:3px 6px;margin:-3px -6px}
+  .ax input.name:focus,.card input.pname:focus{outline:0;border-color:var(--gold);background:#0b0e16}
+  .ax .st{font:12px var(--mono);color:var(--c);white-space:nowrap}
+  .ax .st.dim{color:var(--mute)}
+  .tog{border:0;border-radius:14px;padding:5px 13px;font:700 13px var(--mono);background:var(--c);color:#12151f;cursor:pointer}
+  .tog.off{background:#262d40;color:var(--mute)}
+  .x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:16px;padding:2px 4px}
+  .x:hover{color:#ff6b6b}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+  .card.off .dot,.card.off input.pname,.card.off .reach{opacity:.4}
+  .card .tog{padding:4px 11px;font-size:12px}
+  .card.sel{border:1.5px solid var(--c);background:#141a2b}
+  .card .hd{display:flex;align-items:center;gap:10px}
+  .card .dot{width:22px;height:22px}
+  .card input.pname{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:6px;color:var(--text);font:500 16px var(--sans);padding:3px 6px;margin:-3px -6px;cursor:pointer}
+  .card.sel input.pname{cursor:text}
+  .card .reach{font:13px var(--mono);color:var(--mute)} .card .reach b{color:var(--text);font-weight:500;font-size:15px}
+  .sl{display:grid;grid-template-columns:78px 1fr 40px;align-items:center;gap:10px;margin-top:12px;cursor:default}
+  .sl .n{font:12.5px var(--mono);color:var(--c);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sl input[type=number]{width:100%;background:transparent;border:0;border-bottom:1px solid transparent;color:var(--text);font:14px var(--mono);text-align:right;padding:2px 0;-moz-appearance:textfield}
+  .sl input[type=number]::-webkit-inner-spin-button{display:none}
+  .sl input[type=number]:focus{outline:0;border-color:var(--gold)}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:18px;background:transparent;margin:0}
+  input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--c) var(--p),#2a3144 var(--p))}
+  input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:#2a3144}
+  input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--c)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#f1f3fb;border:3px solid var(--c);margin-top:-6px;box-shadow:0 0 8px var(--c)}
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#f1f3fb;border:3px solid var(--c)}
+  .ctabs{display:flex;gap:4px;margin-top:12px;background:#0b0e16;border-radius:9px;padding:3px}
+  .ctabs button{flex:1;background:transparent;border:0;color:var(--mute);font:500 13px var(--sans);padding:6px;border-radius:7px;cursor:pointer}
+  .ctabs button.on{background:#232b40;color:var(--text)}
+  .time{cursor:default}
+  .trow{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--mute)}
+  .trow label{flex:1}
+  .trow input,.trow select{width:64px;background:#0b0e16;border:1px solid var(--line);border-radius:6px;color:var(--text);font:13px var(--mono);padding:4px 6px;text-align:right}
+  .trow select{width:auto;text-align:left}
+  .sl .h{font:12.5px var(--mono);color:var(--text);text-align:right;white-space:nowrap}
+  .time .sl{grid-template-columns:78px 1fr 58px}
+  .insight{margin-top:12px;padding:9px 11px;border-radius:9px;background:#1a1c14;border:1px solid #4a4020;font-size:13px;line-height:1.55}
+  .note{margin-top:8px;font-size:11.5px;color:var(--mute);line-height:1.5}
+  #view{position:relative;min-width:0}
+  canvas{display:block}
+  #radar{position:absolute;inset:0;display:none}
+  #tip{position:absolute;z-index:5;pointer-events:none;display:none;background:#0f1420f2;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font:12.5px var(--mono);white-space:nowrap;box-shadow:0 6px 20px #0008}
+  #tip b{font-weight:500}
+  #bar{position:absolute;left:18px;top:16px;display:flex;gap:12px;flex-wrap:wrap;z-index:2}
+  .grp{display:flex;align-items:center;gap:4px;background:#0f1420e6;border:1px solid var(--line);border-radius:12px;padding:5px}
+  .grp .lbl{font:11px var(--mono);letter-spacing:.12em;color:var(--mute);padding:0 10px 0 8px}
+  .b{background:transparent;border:0;color:var(--text);font:500 14px var(--sans);padding:7px 13px;border-radius:8px;cursor:pointer}
+  .b:hover{background:#1b2236}
+  .b.on{background:#f1f3fb;color:#12151f}
+  #hint{position:absolute;right:18px;top:78px;font:12px var(--mono);color:var(--mute);z-index:2;text-align:right;max-width:55%}
+  #info{position:absolute;left:18px;bottom:16px;z-index:2;background:#0f1420e6;border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:250px;pointer-events:none}
+  #info .k{font:11px var(--mono);letter-spacing:.1em;color:var(--mute);text-transform:uppercase}
+  #info .big{font:700 34px var(--sans);line-height:1.15;margin:4px 0 0}
+  #info .big small{font:400 13px var(--sans);color:var(--mute);margin-left:6px}
+  #info .m{font:12px var(--mono);color:var(--mute);margin-top:4px}
+  #shot{position:fixed;inset:0;z-index:20;background:#05070ce6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:max(16px,env(safe-area-inset-top,0px)) 16px max(16px,env(safe-area-inset-bottom,0px))}
+  #shot[hidden]{display:none}
+  #shot img{max-width:100%;max-height:72%;border-radius:12px;border:1px solid var(--line);-webkit-touch-callout:default;user-select:auto}
+  #shot p{margin:0;color:var(--text);font-size:15px;text-align:center;line-height:1.5}
+  #shot p small{display:block;color:var(--mute);font-size:13px}
+  #shot button{background:var(--gold);color:#12151f;border:0;border-radius:20px;padding:9px 22px;font:600 14px var(--sans);cursor:pointer}
+  @media(max-width:860px){
+    #app{grid-template-columns:1fr;grid-template-rows:minmax(0,55fr) minmax(0,45fr)}
+    aside{order:2;border-right:0;border-top:1px solid var(--line);padding:18px 16px}
+    #view{order:1}
+    h1{font-size:24px}
+    #hint{display:none}
+    #bar{left:0;right:0;top:8px;padding:0 10px;flex-wrap:nowrap;overflow-x:auto;gap:8px;scrollbar-width:none}
+    #bar::-webkit-scrollbar{display:none}
+    .grp{flex:none;padding:3px}
+    .grp .lbl{padding:0 6px;font-size:10px}
+    .b{padding:6px 10px;font-size:13px}
+    #info{left:10px;bottom:10px;padding:8px 12px;min-width:0;max-width:calc(100% - 20px)}
+    #info .big{font-size:24px}
+    #info .m:not([style]){display:none}
+  }
+  @media(pointer:coarse){
+    input[type=range]{height:28px}
+    input[type=range]::-webkit-slider-thumb{width:22px;height:22px;margin-top:-9px}
+    input[type=range]::-moz-range-thumb{width:18px;height:18px}
+    .tog{padding:7px 14px}
+    .x{font-size:18px;padding:4px 8px}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <aside>
+    <h1>Top Corner <span>Lab</span></h1>
+    <div class="desc">กราฟนี้ช่วยให้คุณเห็นว่าตัวเองเก่งตรงไหนเมื่อมองหลายด้านพร้อมกัน<br>
+      ไม่ต้องเก่งที่สุดในแกนเดียว แค่หา "พื้นที่" ที่ส่วนผสมของสกิลของคุณไม่มีใครเหมือน<br>
+      แล้วสู้ในสนามที่คุณเก่ง และที่สำคัญ…
+      <div class="motto">Never give up</div>
+      <div class="credit">ต้นแบบแนวคิดจาก <b>9ARM</b> · ถอดแบบและปรับปรุงโดย <b>Coach &amp; Opus 5.5</b><br>
+      กดติดตามได้ที่ <a href="https://www.instagram.com/coach.sriravich" target="_blank" rel="noopener">IG</a> / <a href="https://www.tiktok.com/@coach.sriravich" target="_blank" rel="noopener">TT</a> <b>Coach.Sriravich</b></div></div>
+    <div class="sec"><span class="t" id="dimT">DIMENSIONS · 3 IN USE</span><button class="pill" id="addAxis">+ Add axis</button></div>
+    <div id="axes"></div>
+    <div class="sec"><span class="t" id="ptT">POINTS · 2</span><button class="pill" id="addPoint">+ Add point</button></div>
+    <div id="points"></div>
+  </aside>
+  <div id="view">
+    <div id="bar">
+      <div class="grp"><span class="lbl">DIMENSIONS</span><span id="dimBtns" style="display:flex;gap:4px"></span></div>
+      <div class="grp" id="gAlt"><button class="b" id="alt">Radar view</button></div>
+      <div class="grp" id="gSurf"><button class="b" id="surf">Equal-reach surface</button></div>
+      <div class="grp" id="gCam"><button class="b" id="orbit">Orbit</button><button class="b" id="reset">Reset view</button></div>
+      <div class="grp" id="gTime"><span class="lbl">อนาคต</span><input type="range" id="months" min="0" max="24" step="1" value="0" style="width:120px;--c:#f6c85f"><span class="lbl" id="mLbl" style="min-width:74px;color:var(--text)">ตอนนี้</span></div>
+      <div class="grp"><button class="b" id="save">⤓ Save image</button></div>
+    </div>
+    <div id="hint"></div>
+    <canvas id="radar"></canvas>
+    <div id="tip"></div>
+    <div id="info"></div>
+  </div>
+  <div id="shot" hidden role="dialog" aria-label="Saved image">
+    <img id="shotImg" alt="Top Corner Lab graph">
+    <p>มือถือ / iPad: กดค้างที่รูป แล้วเลือก "บันทึกรูปภาพ"<small>คอมพิวเตอร์: คลิกขวาที่รูป แล้วเลือก Save image as…</small></p>
+    <button id="shotClose" type="button">ปิด</button>
+  </div>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const SIZE = 10, MAX_AXES = 8, KEY = 'top-corner-lab-v3';
+const AX_COLORS = ['#f4796b','#4fd1c5','#f6c85f','#7cc4ff','#b5e55c','#c792ea','#ff9f6b','#f78fb3'];
+const PT_COLORS = ['#8b93ff','#ff8fb3','#b5e55c','#4fd1c5','#f6c85f','#f4796b','#c792ea','#7cc4ff'];
+const uid = () => Math.random().toString(36).slice(2,8);
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp = v => Math.max(0,Math.min(100,Math.round(+v||0)));
+
+// ---------- state ----------
+function defaults(){
+  // 5 life axes for university students
+  const axes=['วิชาการ','สกิลใช้งานจริง','สื่อสาร & คอนเนคชั่น','ประสบการณ์จริง','สุขภาพกายใจ'].map((n,i)=>({id:uid(),name:n,color:AX_COLORS[i],on:true}));
+  const mk=(name,ci,v)=>({id:uid(),name,color:PT_COLORS[ci],vals:Object.fromEntries(axes.map((a,i)=>[a.id,v[i]]))});
+  const points=[mk('คุณ',0,[60,55,65,45,60]),mk('A',1,[95,40,30,25,45])];
+  return {axes,points,sel:points[0].id,surface:false};
+}
+let S=null;
+try{ S=JSON.parse(localStorage.getItem(KEY)); }catch(e){}
+if(!S||!S.axes?.length||!S.points?.length) S=defaults();
+if(!S.points.find(p=>p.id===S.sel)) S.sel=S.points[0].id;
+const save=()=>{ try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} };
+
+const onAxes = () => S.axes.filter(a=>a.on);
+const drawnAxes = () => onAxes().slice(0,3);
+const val = (p,a) => p.vals[a.id] ?? 50;
+const sel = () => S.points.find(p=>p.id===S.sel);
+const visPoints = () => S.points.filter(p=>!p.off);   // points switched on
+const gapOf = p => Math.hypot(...onAxes().map(a=>100-val(p,a)));
+const maxGap = () => Math.sqrt(onAxes().length)*100;
+const reachOf = p => (1-gapOf(p)/maxGap())*100;
+// ---------- learning time · model: the higher a skill, the slower it climbs ----------
+// v(t) = 100 − (100 − v0)·e^(−K·speed·hours·weeks);  K: 10 h/week for one year halves the distance to 100
+const K = Math.LN2/520, SPEEDS=[0.5,0.75,1,1.5,2];
+const months = () => S.months||0;
+const hoursOf = p => p.hours ?? 20;
+function alloc(p){                  // effective hours per on-axis, always summing to hoursOf(p)
+  const on=onAxes(), raw=on.map(a=>Math.max(0,p.alloc?.[a.id]??0)), sum=raw.reduce((x,y)=>x+y,0), H=hoursOf(p);
+  return Object.fromEntries(on.map((a,i)=>[a.id, sum>0?raw[i]/sum*H:H/on.length]));
+}
+function project(p,m,extra){
+  const al=alloc(p), w=m*4.345, sp=p.speed??1;
+  return Object.fromEntries(onAxes().map(a=>[a.id, 100-(100-val(p,a))*Math.exp(-K*sp*(al[a.id]+(extra?.[a.id]||0))*w)]));
+}
+const ghostOf = p => ({id:'ghost', name:p.name, color:p.color, vals:{...p.vals,...project(p,months())}});
+const reachVals = vals => (1-Math.hypot(...onAxes().map(a=>100-(vals[a.id]??50)))/maxGap())*100;
+// 1–2 axes: line / square · 3 axes: cube (alt: radar) · 4+ axes: radar (alt: sphere)
+const mode = () => { const n=onAxes().length; if(n<=2) return 'flat'; if(n===3) return S.alt3?'radar':'cube'; return S.alt4?'sphere':'radar'; };
+const isRadar = () => mode()==='radar';
+const hexA = (hex,a) => { const n=parseInt(hex.slice(1),16); return `rgba(${n>>16},${n>>8&255},${n&255},${a})`; };
+
+// ---------- three ----------
+const view=$('view');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.localClippingEnabled=true;
+view.appendChild(renderer.domElement);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0b0e16);
+const camera=new THREE.PerspectiveCamera(48,1,.1,200);
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.autoRotateSpeed=1.2;
+scene.add(new THREE.AmbientLight(0xffffff,.8));
+const dl=new THREE.DirectionalLight(0xffffff,.8); dl.position.set(8,14,10); scene.add(dl);
+const dyn=new THREE.Group(); scene.add(dyn);
+let surfaceMesh=null, flatPlane=null, hoverables=[];
+
+function setView(){
+  const d=drawnAxes().length, m=mode();
+  if(m==='sphere'){ camera.position.set(9.5,6,11.5); controls.target.set(0,0,0); }
+  else if(d>=3){ camera.position.set(17,10.5,19); controls.target.set(SIZE/2,SIZE/2,SIZE/2); }
+  else if(d===2){ camera.position.set(SIZE/2+.6,SIZE/2+.4,19); controls.target.set(SIZE/2+.6,SIZE/2+.4,0); }
+  else { camera.position.set(SIZE/2+.6,2.2,19); controls.target.set(SIZE/2+.6,1.2,0); }
+  controls.enableRotate=m==='cube'||m==='sphere';
+  if(!controls.enableRotate){ controls.autoRotate=false; $('orbit').classList.remove('on'); }
+  controls.update();
+}
+
+function glowTex(){
+  const c=document.createElement('canvas'); c.width=c.height=128; const g=c.getContext('2d');
+  const r=g.createRadialGradient(64,64,0,64,64,64); r.addColorStop(0,'rgba(255,255,255,1)'); r.addColorStop(.25,'rgba(255,255,255,.45)'); r.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=r; g.fillRect(0,0,128,128); return new THREE.CanvasTexture(c);
+}
+const GLOW=glowTex();
+function glow(color,size,op=.9){
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:GLOW,color,transparent:true,opacity:op,blending:THREE.AdditiveBlending,depthWrite:false}));
+  s.scale.set(size,size,1); return s;
+}
+function label(text,color='#eef1fa',scale=1.4){
+  const c=document.createElement('canvas'); c.width=512; c.height=128;
+  const g=c.getContext('2d'); g.font='500 52px "JetBrains Mono","Segoe UI",Tahoma,monospace'; g.textAlign='center'; g.textBaseline='middle';
+  g.fillStyle=color; g.shadowColor='#000'; g.shadowBlur=6; g.fillText(text,256,64);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthTest:false}));
+  s.scale.set(scale*2.4,scale*.6,1); s.renderOrder=10; return s;
+}
+function seg(a,b,color,op=1,dashed=false){
+  const g=new THREE.BufferGeometry().setFromPoints([a,b]);
+  const m=dashed?new THREE.LineDashedMaterial({color,transparent:true,opacity:op,dashSize:.25,gapSize:.18}):new THREE.LineBasicMaterial({color,transparent:true,opacity:op});
+  const l=new THREE.Line(g,m); if(dashed) l.computeLineDistances(); return l;
+}
+function arrow(dir,color){
+  const g=new THREE.Group(), len=SIZE+.2;
+  const cyl=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,len,8),new THREE.MeshBasicMaterial({color}));
+  cyl.position.copy(dir).multiplyScalar(len/2); cyl.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir); g.add(cyl);
+  const cone=new THREE.Mesh(new THREE.ConeGeometry(.15,.45,14),new THREE.MeshBasicMaterial({color}));
+  cone.position.copy(dir).multiplyScalar(len+.15); cone.quaternion.copy(cyl.quaternion); g.add(cone); return g;
+}
+
+const DIRS=[new THREE.Vector3(1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,0,1)];
+function pos(p){ const v=[0,0,0]; drawnAxes().forEach((a,i)=>v[i]=val(p,a)/100*SIZE); return new THREE.Vector3(...v); }
+function topPos(){ const v=[0,0,0]; drawnAxes().forEach((a,i)=>v[i]=SIZE); return new THREE.Vector3(...v); }
+
+function build(){
+  const radar=isRadar();
+  renderer.domElement.style.display=radar?'none':'block'; radarCv.style.display=radar?'block':'none';
+  if(radar){ drawRadarScreen(); return; }
+  while(dyn.children.length){ const o=dyn.children.pop(); o.traverse(n=>{n.geometry?.dispose(); n.material?.map&&n.material.map!==GLOW&&n.material.map.dispose(); n.material?.dispose();}); }
+  surfaceMesh=null; flatPlane=null; hoverables=[];
+  if(mode()==='sphere'){ buildSphere(); return; }
+  const dr=drawnAxes(), d=dr.length, has=[d>=1,d>=2,d>=3];
+  const top=topPos();
+
+  // grids / cube
+  const grid=()=>{const g=new THREE.GridHelper(SIZE,10,0x2a3350,0x1a2033); g.material.transparent=true; g.material.opacity=.7; return g;};
+  if(d>=2){ const g=grid(); g.rotation.x=Math.PI/2; g.position.set(SIZE/2,SIZE/2,0); dyn.add(g); }
+  if(d>=3){ const g=grid(); g.position.set(SIZE/2,0,SIZE/2); dyn.add(g); const g2=grid(); g2.rotation.z=Math.PI/2; g2.position.set(0,SIZE/2,SIZE/2); dyn.add(g2); }
+  const bx=new THREE.BoxGeometry(SIZE,d>=2?SIZE:.01,d>=3?SIZE:.01);
+  const bl=new THREE.LineSegments(new THREE.EdgesGeometry(bx),new THREE.LineBasicMaterial({color:0x2e3756,transparent:true,opacity:.8}));
+  bl.position.set(SIZE/2,d>=2?SIZE/2:0,d>=3?SIZE/2:0); dyn.add(bl);
+
+  // axes
+  dr.forEach((a,i)=>{
+    const col=new THREE.Color(a.color);
+    dyn.add(arrow(DIRS[i],col));
+    const nm=label(a.name,a.color,1.5); nm.position.copy(DIRS[i]).multiplyScalar(SIZE+1.35);
+    if(i===1) nm.position.x-=.3; dyn.add(nm);
+    for(const t of [0,20,40,60,80,100]){
+      const l=label(String(t),'#6c7694',.75);
+      l.position.copy(DIRS[i]).multiplyScalar(t/100*SIZE).add(new THREE.Vector3(i===0?0:-.65,i===0?-.55:0,i===2?.55:0)); dyn.add(l);
+    }
+  });
+
+  // equal-reach surface around Top for the selected point
+  if(S.surface && d>=1){
+    const p=sel(); const undrawn=onAxes().slice(3).reduce((s,a)=>s+(100-val(p,a))**2,0);
+    const r=Math.sqrt(Math.max(0,gapOf(p)**2-undrawn))/100*SIZE;
+    if(r>.02){
+      const col=0xf6c85f;
+      if(d>=3){
+        const pl=[[1,0,0,0],[-1,0,0,SIZE],[0,1,0,0],[0,-1,0,SIZE],[0,0,1,0],[0,0,-1,SIZE]].map(a=>new THREE.Plane(new THREE.Vector3(a[0],a[1],a[2]),a[3]));
+        const geo=new THREE.SphereGeometry(r,56,36);
+        surfaceMesh=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.1,side:THREE.DoubleSide,depthWrite:false,clippingPlanes:pl}));
+        surfaceMesh.position.copy(top); dyn.add(surfaceMesh);
+        const wf=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.25,wireframe:true,depthWrite:false,clippingPlanes:pl}));
+        wf.position.copy(top); dyn.add(wf);
+      } else if(d===2){
+        let cur=[]; const flush=()=>{ if(cur.length>1) dyn.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(cur),new THREE.LineBasicMaterial({color:col,transparent:true,opacity:.9}))); cur=[]; };
+        for(let k=0;k<=240;k++){ const t=k/240*Math.PI*2, x=SIZE+Math.cos(t)*r, y=SIZE+Math.sin(t)*r;
+          if(x>=-.001&&x<=SIZE+.001&&y>=-.001&&y<=SIZE+.001) cur.push(new THREE.Vector3(x,y,0)); else flush(); }
+        flush();
+      } else if(SIZE-r>=0){ dyn.add(seg(new THREE.Vector3(SIZE-r,-.4,0),new THREE.Vector3(SIZE-r,.4,0),col,1)); }
+    }
+  }
+  // click target for 1D/2D
+  flatPlane=new THREE.Mesh(new THREE.PlaneGeometry(400,400),new THREE.MeshBasicMaterial({visible:false})); dyn.add(flatPlane);
+
+  // top
+  const tm=new THREE.Mesh(new THREE.OctahedronGeometry(.3),new THREE.MeshBasicMaterial({color:0xf6c85f}));
+  tm.scale.set(1,1.2,1); tm.position.copy(top); tm.name='top'; dyn.add(tm);
+  const tg=glow(0xf6c85f,2.6,.85); tg.position.copy(top); dyn.add(tg);
+  const tl=label('top','#f6c85f',1.2); tl.position.copy(top).add(new THREE.Vector3(.2,.85,0)); dyn.add(tl);
+
+  // points
+  const cur=sel();
+  visPoints().forEach(p=>{
+    const P=pos(p), c=new THREE.Color(p.color), isSel=p.id===S.sel;
+    const m=new THREE.Mesh(new THREE.SphereGeometry(isSel?.24:.2,24,16),new THREE.MeshBasicMaterial({color:c})); m.position.copy(P); m.userData={p}; hoverables.push(m); dyn.add(m);
+    const g=glow(c,isSel?1.9:1.2,isSel?.8:.5); g.position.copy(P); dyn.add(g);
+    const l=label(p.name,'#d9deef',1.1); l.position.copy(P).add(new THREE.Vector3(.1,.7,0)); dyn.add(l);
+    if(isSel){
+      const arr=[P.x,P.y,P.z];
+      for(let i=0;i<d;i++){ const q=[...arr]; q[i]=0; dyn.add(seg(P,new THREE.Vector3(...q),dr[i].color,.45)); }
+      dyn.add(seg(P,top,0xcdd3e6,.6,true));
+    }
+  });
+  if(months()>0 && !cur.off){
+    const P=pos(cur), G=pos(ghostOf(cur));
+    const gm=new THREE.Mesh(new THREE.SphereGeometry(.22,20,14),new THREE.MeshBasicMaterial({color:0xf1f3fb,wireframe:true,transparent:true,opacity:.85})); gm.position.copy(G); dyn.add(gm);
+    const gg=glow(new THREE.Color(cur.color),1.2,.35); gg.position.copy(G); dyn.add(gg);
+    if(G.distanceTo(P)>.01) dyn.add(seg(P,G,0xf1f3fb,.8,true));
+    const gl=label(`+${months()} เดือน`,'#f1f3fb',.95); gl.position.copy(G).add(new THREE.Vector3(.1,-.6,0)); dyn.add(gl);
+  }
+  void has;
+}
+
+// ---------- sphere view (4+ axes, 3D radar you can orbit) ----------
+const RS=6;
+function fibDirs(n){            // spread n spoke directions evenly over a sphere
+  const ga=Math.PI*(3-Math.sqrt(5)), out=[];
+  for(let i=0;i<n;i++){ const y=1-2*i/(n-1), r=Math.sqrt(1-y*y), t=ga*i; out.push(new THREE.Vector3(Math.cos(t)*r,y,Math.sin(t)*r)); }
+  return out;
+}
+function hullFaces(d){          // convex hull of the unit directions (n ≤ 8, brute force)
+  const f=[], n=d.length, A=new THREE.Vector3(), B=new THREE.Vector3();
+  for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) for(let k=j+1;k<n;k++){
+    const nr=A.subVectors(d[j],d[i]).clone().cross(B.subVectors(d[k],d[i])); if(nr.lengthSq()<1e-9) continue; nr.normalize();
+    const c=nr.dot(d[i]); let pos=0,neg=0;
+    for(let m=0;m<n;m++){ if(m===i||m===j||m===k) continue; const sd=nr.dot(d[m])-c; if(sd>1e-6) pos++; else if(sd<-1e-6) neg++; }
+    if(pos&&neg) continue; f.push(pos?[i,k,j]:[i,j,k]);
+  }
+  return f;
+}
+function shape(dirs,faces,vals,color,fillOp,edgeOp){
+  const g=new THREE.Group(), pts=dirs.map((d,i)=>d.clone().multiplyScalar(Math.max(.02,vals[i]/100*RS)));
+  const geo=new THREE.BufferGeometry().setFromPoints(pts); geo.setIndex(faces.flat()); geo.computeVertexNormals();
+  if(fillOp>0) g.add(new THREE.Mesh(geo,new THREE.MeshPhongMaterial({color,transparent:true,opacity:fillOp,side:THREE.DoubleSide,depthWrite:false,shininess:60})));
+  const seen=new Set(), ep=[];
+  faces.forEach(t=>[[t[0],t[1]],[t[1],t[2]],[t[2],t[0]]].forEach(([a,b])=>{ const k=a<b?a+'-'+b:b+'-'+a; if(!seen.has(k)){ seen.add(k); ep.push(pts[a],pts[b]); } }));
+  g.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(ep),new THREE.LineBasicMaterial({color,transparent:true,opacity:edgeOp})));
+  return {g,pts};
+}
+function buildSphere(){
+  const on=onAxes(), dirs=fibDirs(on.length), faces=hullFaces(dirs);
+  // reference shells: 50 and top (100 on every axis)
+  dyn.add(shape(dirs,faces,on.map(()=>50),0x2e3756,0,.7).g);
+  const top=shape(dirs,faces,on.map(()=>100),0xf6c85f,.035,.55); dyn.add(top.g);
+  const ring=new THREE.Mesh(new THREE.SphereGeometry(RS,28,16),new THREE.MeshBasicMaterial({color:0xf6c85f,wireframe:true,transparent:true,opacity:.035,depthWrite:false})); dyn.add(ring);
+  const tl=label('top','#f6c85f',1.1); tl.position.copy(top.pts[0]).add(new THREE.Vector3(.5,.6,0)); dyn.add(tl);
+  // spokes
+  on.forEach((a,i)=>{
+    const col=new THREE.Color(a.color), d=dirs[i], len=RS*1.06, q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),d);
+    const cyl=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,len,8),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.75}));
+    cyl.position.copy(d).multiplyScalar(len/2); cyl.quaternion.copy(q); dyn.add(cyl);
+    const cone=new THREE.Mesh(new THREE.ConeGeometry(.11,.32,12),new THREE.MeshBasicMaterial({color:col})); cone.position.copy(d).multiplyScalar(len+.12); cone.quaternion.copy(q); dyn.add(cone);
+    const nm=label(a.name,a.color,1.35); nm.position.copy(d).multiplyScalar(RS*1.25); dyn.add(nm);
+    for(const t of [20,40,60,80]){ const dot=new THREE.Mesh(new THREE.SphereGeometry(.035,6,4),new THREE.MeshBasicMaterial({color:0x4a5577})); dot.position.copy(d).multiplyScalar(t/100*RS); dyn.add(dot); }
+  });
+  dyn.add(new THREE.Mesh(new THREE.SphereGeometry(.08,12,8),new THREE.MeshBasicMaterial({color:0xcdd3e6})));
+  // people: one solid per point, selected one brightest
+  [...visPoints().filter(p=>p.id!==S.sel),sel()].filter(p=>!p.off).forEach(p=>{
+    const isSel=p.id===S.sel, c=new THREE.Color(p.color), vals=on.map(a=>val(p,a));
+    const sh=shape(dirs,faces,vals,c,isSel?.3:.1,isSel?1:.55); dyn.add(sh.g);
+    sh.pts.forEach((P,i)=>{
+      const m=new THREE.Mesh(new THREE.SphereGeometry(isSel?.13:.1,14,10),new THREE.MeshBasicMaterial({color:isSel?0xf1f3fb:c}));
+      m.position.copy(P); m.userData={p,a:on[i],v:vals[i]}; hoverables.push(m); dyn.add(m);
+      if(isSel){ const g=glow(c,.8,.7); g.position.copy(P); dyn.add(g); }
+    });
+  });
+  const cur=sel();
+  if(months()>0 && !cur.off){ const g=ghostOf(cur); dyn.add(shape(dirs,faces,on.map(a=>g.vals[a.id]),new THREE.Color(0xf1f3fb),0,.8).g); }
+}
+
+// ---------- radar (4+ axes) ----------
+let radarHits=[];
+const radarCv=$('radar');
+const SANS='"Space Grotesk","Segoe UI",Tahoma,sans-serif', MONO='"JetBrains Mono",Consolas,monospace';
+function drawRadar(ctx,w,h,exp){
+  ctx.fillStyle='#0b0e16'; ctx.fillRect(0,0,w,h);
+  const on=onAxes(), n=on.length;
+  const cx=w/2, cy=h/2+(exp?40:(w<500?22:30)), R=Math.max(40,Math.min(w*(exp?.27:(w<500?.27:.3)),(h-(exp?300:(w<500?170:240)))/2));
+  const ang=i=>-Math.PI/2+i*2*Math.PI/n;
+  const pt=(i,v)=>[cx+Math.cos(ang(i))*R*v/100, cy+Math.sin(ang(i))*R*v/100];
+  const poly=vals=>{ ctx.beginPath(); vals.forEach((v,i)=>{ const [x,y]=pt(i,v); i?ctx.lineTo(x,y):ctx.moveTo(x,y); }); ctx.closePath(); };
+  // rings
+  for(const v of [20,40,60,80,100]){ poly(on.map(()=>v)); ctx.strokeStyle=v===100?'#2e3756':'#1c2335'; ctx.lineWidth=1; ctx.stroke(); }
+  ctx.font=`11px ${MONO}`; ctx.fillStyle='#5f6986'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  for(const v of [20,40,60,80]){ const [x,y]=pt(0,v); ctx.fillText(v,x+6,y); }
+  // spokes + names
+  on.forEach((a,i)=>{
+    const [x,y]=pt(i,100); ctx.strokeStyle=hexA(a.color,.6); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
+    const c=Math.cos(ang(i)), s=Math.sin(ang(i)), lx=cx+c*(R+20), ly=cy+s*(R+20);
+    const al=Math.abs(c)<.2?'center':c>0?'left':'right';
+    const room=al==='center'?w-12:al==='left'?w-6-lx:lx-6;
+    let fs=exp?17:(w<500?13:15); ctx.font=`600 ${fs}px ${SANS}`;
+    while(fs>9&&ctx.measureText(a.name).width>room){ fs--; ctx.font=`600 ${fs}px ${SANS}`; }
+    ctx.fillStyle=a.color; ctx.textAlign=al; ctx.textBaseline=Math.abs(s)<.2?'middle':s>0?'top':'bottom';
+    ctx.fillText(a.name,al==='center'?Math.min(Math.max(lx,w/2-room/2),w/2+room/2):lx,ly);
+  });
+  // top (100 on every axis)
+  ctx.save(); poly(on.map(()=>100)); ctx.setLineDash([6,5]); ctx.strokeStyle='#f6c85f'; ctx.lineWidth=1.8;
+  ctx.shadowColor='#f6c85f'; ctx.shadowBlur=12; ctx.stroke(); ctx.restore();
+  { const [x,y]=pt(0,100); ctx.font=`12px ${MONO}`; ctx.fillStyle='#f6c85f'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText('top',x+10,y+16); }
+  // points (selected drawn last, on top)
+  const order=[...visPoints().filter(p=>p.id!==S.sel),sel()].filter(p=>!p.off);
+  if(!exp) radarHits=[];
+  order.forEach(p=>{
+    const isSel=p.id===S.sel, vals=on.map(a=>val(p,a));
+    ctx.save(); poly(vals); ctx.fillStyle=hexA(p.color,isSel?.22:.1); ctx.fill();
+    ctx.strokeStyle=p.color; ctx.lineWidth=isSel?2.6:1.4; if(isSel){ ctx.shadowColor=p.color; ctx.shadowBlur=14; } ctx.stroke(); ctx.restore();
+    vals.forEach((v,i)=>{ const [x,y]=pt(i,v); if(!exp) radarHits.push({x,y,p,a:on[i],v}); ctx.beginPath(); ctx.arc(x,y,isSel?4.5:3,0,7); ctx.fillStyle=isSel?'#f1f3fb':p.color; ctx.fill();
+      if(isSel){ ctx.strokeStyle=p.color; ctx.lineWidth=2; ctx.stroke(); } });
+  });
+  if(months()>0 && !sel().off){
+    const g=ghostOf(sel()), gv=on.map(a=>g.vals[a.id]);
+    ctx.save(); poly(gv); ctx.setLineDash([5,4]); ctx.strokeStyle='rgba(241,243,251,.85)'; ctx.lineWidth=1.8; ctx.stroke(); ctx.restore();
+    gv.forEach((v,i)=>{ const [x,y]=pt(i,v); ctx.beginPath(); ctx.arc(x,y,3.5,0,7); ctx.strokeStyle=sel().color; ctx.lineWidth=1.5; ctx.stroke(); });
+    const [x,y]=pt(0,gv[0]); ctx.font=`12px ${MONO}`; ctx.fillStyle='#f1f3fb'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.fillText(`+${months()} เดือน`,x+10,y-12);
+  }
+  drawLegend(ctx,w,exp?90:112);
+}
+function drawLegend(ctx,w,y){
+  const x=w-24; ctx.textBaseline='middle';
+  visPoints().forEach((p,i)=>{
+    const yy=y+i*24, r=reachOf(p).toFixed(1)+'%';
+    ctx.font=`500 13px ${MONO}`; ctx.fillStyle=p.id===S.sel?'#eef1fa':'#8a93ad'; ctx.textAlign='right'; ctx.fillText(r,x,yy);
+    const rw=ctx.measureText(r).width;
+    ctx.font=`500 14px ${SANS}`; ctx.fillStyle='#eef1fa'; ctx.fillText(p.name,x-rw-12,yy);
+    const nw=ctx.measureText(p.name).width;
+    ctx.beginPath(); ctx.arc(x-rw-nw-24,yy,6,0,7); ctx.fillStyle=p.color; ctx.fill();
+  });
+}
+function drawRadarScreen(){
+  const w=view.clientWidth,h=view.clientHeight,dpr=Math.min(devicePixelRatio,2);
+  radarCv.width=w*dpr; radarCv.height=h*dpr; radarCv.style.width=w+'px'; radarCv.style.height=h+'px';
+  const ctx=radarCv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); drawRadar(ctx,w,h,false);
+}
+function drawHeader(ctx){
+  ctx.textAlign='left'; ctx.textBaseline='alphabetic';
+  ctx.font=`700 30px ${SANS}`; ctx.fillStyle='#eef1fa'; ctx.fillText('Top Corner ',28,50);
+  const tw=ctx.measureText('Top Corner ').width; ctx.fillStyle='#f6c85f'; ctx.fillText('Lab',28+tw,50);
+  const on=onAxes();
+  ctx.font=`12px ${MONO}`; ctx.fillStyle='#8a93ad';
+  ctx.fillText(`${on.length}D · ${on.map(a=>a.name).join(' · ')}`+(months()>0?`  ·  เส้นประ = ${sel().name} อีก ${months()} เดือน`:''),28,74);
+}
+function savePNG(){
+  let out;
+  if(isRadar()){
+    out=document.createElement('canvas'); out.width=1600; out.height=1100;
+    const ctx=out.getContext('2d'); drawRadar(ctx,1600,1100,true); drawHeader(ctx);
+  } else {
+    renderer.render(scene,camera);                       // draw now so the WebGL buffer is fresh
+    const src=renderer.domElement, k=src.width/view.clientWidth;
+    out=document.createElement('canvas'); out.width=src.width; out.height=src.height;
+    const ctx=out.getContext('2d'); ctx.drawImage(src,0,0); ctx.scale(k,k);
+    drawHeader(ctx); drawLegend(ctx,view.clientWidth,40);
+  }
+  // A top-level desktop page (e.g. GitHub Pages) downloads the file. Inside a shared-page frame downloads
+  // are blocked, and phones save images more naturally by long-press, so show the image there instead.
+  if(window.self===window.top && !matchMedia('(pointer:coarse)').matches){
+    out.toBlob(b=>{
+      const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+      a.download=`top-corner-lab-${onAxes().length}D-${mode()}-${new Date().toISOString().slice(0,10)}.png`;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    },'image/png');
+    return;
+  }
+  $('shotImg').src=out.toDataURL('image/png'); $('shot').hidden=false;
+}
+$('shotClose').onclick=()=>{ $('shot').hidden=true; $('shotImg').removeAttribute('src'); };
+$('shot').onclick=e=>{ if(e.target.id==='shot') $('shotClose').click(); };
+
+// ---------- panels ----------
+function renderAxes(){
+  const el=$('axes'); el.innerHTML=''; const on=onAxes();
+  S.axes.forEach(a=>{
+    const di=on.indexOf(a);
+    const st=!a.on?'off':mode()==='radar'||mode()==='sphere'?`spoke ${di+1}`:`drawn as ${'xyz'[di]}`;
+    const row=document.createElement('div'); row.className='ax'; row.style.setProperty('--c',a.color);
+    row.innerHTML=`<span class="dot"></span><input class="name" value="${esc(a.name)}" maxlength="24">
+      <span class="st ${!a.on?'dim':''}">${st}</span><button class="tog ${a.on?'':'off'}">${a.on?'on':'off'}</button><button class="x" title="Remove">✕</button>`;
+    const inp=row.querySelector('input');
+    inp.oninput=()=>{ a.name=inp.value; save(); build(); renderPoints(true); };
+    row.querySelector('.tog').onclick=()=>{ if(a.on&&on.length<=1) return; a.on=!a.on; afterAxesChange(); };
+    row.querySelector('.x').onclick=()=>{ if(S.axes.length<=1) return; S.axes=S.axes.filter(x=>x!==a); afterAxesChange(); };
+    el.appendChild(row);
+  });
+  $('dimT').textContent=`DIMENSIONS · ${on.length} IN USE`;
+  $('addAxis').disabled=S.axes.length>=MAX_AXES;
+}
+function renderDimBtns(){
+  const el=$('dimBtns'); el.innerHTML=''; const n=onAxes().length;
+  for(let k=1;k<=S.axes.length;k++){
+    const b=document.createElement('button'); b.className='b'+(k===n?' on':''); b.textContent=k+'D';
+    b.onclick=()=>{ S.axes.forEach((a,i)=>a.on=i<k); afterAxesChange(); }; el.appendChild(b);
+  }
+}
+function renderPoints(keepFocus){
+  if(keepFocus){ // axis rename: only refresh slider labels
+    document.querySelectorAll('.sl .n[data-a]').forEach(n=>{ const a=S.axes.find(x=>x.id===n.dataset.a); if(a) n.textContent=a.name; });
+    return;
+  }
+  const el=$('points'); el.innerHTML='';
+  S.points.forEach(p=>{
+    const card=document.createElement('div'); card.className='card'+(p.id===S.sel?' sel':'')+(p.off?' off':''); card.style.setProperty('--c',p.color);
+    card.innerHTML=`<div class="hd"><span class="dot"></span><input class="pname" value="${esc(p.name)}" maxlength="24">
+      <span class="reach"><b>${reachOf(p).toFixed(1)}%</b> reach</span><button class="tog ${p.off?'off':''}" title="Show / hide on the graph">${p.off?'off':'on'}</button><button class="x" title="Remove">✕</button></div>`;
+    card.querySelector('.tog').onclick=e=>{ e.stopPropagation(); p.off=!p.off; save(); renderAll(); };
+    card.onclick=e=>{ if(S.sel!==p.id&&!e.target.closest('.x,.tog')){ S.sel=p.id; save(); renderAll(); } };
+    const pn=card.querySelector('.pname');
+    pn.oninput=()=>{ p.name=pn.value; save(); build(); renderInfo(); };
+    card.querySelector('.x').onclick=e=>{ e.stopPropagation(); if(S.points.length<=1) return; S.points=S.points.filter(x=>x!==p); if(S.sel===p.id) S.sel=S.points[0].id; save(); renderAll(); };
+    if(p.id===S.sel){
+      const tabs=document.createElement('div'); tabs.className='ctabs';
+      tabs.innerHTML=`<button data-t="lvl" class="${S.tab!=='time'?'on':''}">ระดับสกิล</button><button data-t="time" class="${S.tab==='time'?'on':''}">⏱ เวลาเรียนรู้</button>`;
+      tabs.onclick=e=>{ e.stopPropagation(); const t=e.target.dataset?.t; if(t&&t!==S.tab){ S.tab=t; save(); renderPoints(); } };
+      card.appendChild(tabs);
+      if(S.tab==='time') renderTime(p,card); else
+      onAxes().forEach(a=>{
+        const v=val(p,a); const r=document.createElement('div'); r.className='sl'; r.style.setProperty('--c',a.color);
+        r.innerHTML=`<span class="n" data-a="${a.id}">${esc(a.name)}</span><input type="range" min="0" max="100" value="${v}"><input type="number" min="0" max="100" value="${v}">`;
+        const rg=r.querySelector('[type=range]'), nm=r.querySelector('[type=number]');
+        const paint=()=>rg.style.setProperty('--p',rg.value+'%'); paint();
+        const set=x=>{ p.vals[a.id]=clamp(x); rg.value=p.vals[a.id]; paint(); if(document.activeElement!==nm) nm.value=p.vals[a.id]; save(); build(); refreshReach(); renderInfo(); };
+        rg.oninput=()=>set(rg.value); nm.oninput=()=>set(nm.value); nm.onblur=()=>{ nm.value=p.vals[a.id]; };
+        r.onclick=e=>e.stopPropagation(); card.appendChild(r);
+      });
+    }
+    el.appendChild(card);
+  });
+  $('ptT').textContent=`POINTS · ${S.points.length}`;
+}
+function renderTime(p,card){
+  const w=document.createElement('div'); w.className='time'; w.onclick=e=>e.stopPropagation();
+  const sp=p.speed??1;
+  w.innerHTML=`<div class="trow"><label>เวลาเรียนรู้ทั้งหมด</label><input type="number" class="hrs" min="0" max="80" value="${hoursOf(p)}"><span>ชม./สัปดาห์</span></div>
+    <div class="trow"><label>ความเร็วการเรียนรู้</label><select class="spd">${SPEEDS.map(x=>`<option value="${x}" ${x===sp?'selected':''}>${x}×</option>`).join('')}</select></div>`;
+  const rows=[];
+  onAxes().forEach(a=>{
+    const r=document.createElement('div'); r.className='sl'; r.style.setProperty('--c',a.color);
+    r.innerHTML=`<span class="n">${esc(a.name)}</span><input type="range" min="0" max="${hoursOf(p)}" step="0.5"><span class="h"></span>`;
+    const rg=r.querySelector('input');
+    rg.oninput=()=>{ setAlloc(p,a,+rg.value); sync(); changed(); };
+    rows.push({a,rg,h:r.querySelector('.h')}); w.appendChild(r);
+  });
+  const ins=document.createElement('div'); ins.className='insight'; w.appendChild(ins);
+  const note=document.createElement('div'); note.className='note';
+  note.textContent='โมเดลคร่าวๆ: ยิ่งคะแนนสูงยิ่งขึ้นช้า (10 ชม./สัปดาห์ ทั้งปี ≈ ปิดระยะถึง 100 ได้ครึ่งหนึ่ง) ใช้ดูทิศทาง ไม่ใช่คำทำนายจริง · เลื่อน "อนาคต" ด้านบนเพื่อดูเส้นประ';
+  w.appendChild(note);
+  function sync(){
+    const al=alloc(p);
+    rows.forEach(({a,rg,h})=>{ rg.max=hoursOf(p); rg.value=al[a.id]; rg.style.setProperty('--p',(hoursOf(p)?al[a.id]/hoursOf(p)*100:0)+'%'); h.textContent=al[a.id].toFixed(1)+' ชม.'; });
+    const hz=months()||12, base=reachVals(project(p,hz)); let best=null;
+    onAxes().forEach(a=>{ const d=reachVals(project(p,hz,{[a.id]:1}))-base; if(!best||d>best.d) best={a,d}; });
+    ins.innerHTML=best?`💡 ถ้าเพิ่มเวลา 1 ชม./สัปดาห์ แกนที่คุ้มสุดคือ <b style="color:${best.a.color}">${esc(best.a.name)}</b> → +${best.d.toFixed(2)}% reach ใน ${hz} เดือน`:'';
+  }
+  function changed(){ save(); build(); renderInfo(); }
+  w.querySelector('.hrs').onchange=e=>{ p.hours=Math.max(0,Math.min(80,+e.target.value||0)); e.target.value=p.hours; sync(); changed(); };
+  w.querySelector('.spd').onchange=e=>{ p.speed=+e.target.value; sync(); changed(); };
+  sync(); card.appendChild(w);
+}
+function setAlloc(p,a,h){            // move one axis; the others share what is left, keeping their ratio
+  const on=onAxes(), al=alloc(p), H=hoursOf(p), rest=Math.max(0,H-h), others=on.filter(x=>x!==a);
+  const so=others.reduce((t,x)=>t+al[x.id],0);
+  p.alloc={[a.id]:Math.min(h,H)};
+  others.forEach(x=>p.alloc[x.id]= so>0 ? al[x.id]/so*rest : rest/others.length);
+}
+function refreshReach(){
+  document.querySelectorAll('.card').forEach((c,i)=>{ const p=S.points[i]; if(p) c.querySelector('.reach').innerHTML=`<b>${reachOf(p).toFixed(1)}%</b> reach`; });
+}
+function renderInfo(){
+  const p=sel(), on=onAxes(), n=on.length;
+  $('info').innerHTML=`<div class="k">Point ${esc(p.name)} · ${n} dimension${n>1?'s':''}${{radar:' · radar view',sphere:' · sphere view'}[mode()]||''}</div>
+    <div class="big">${reachOf(p).toFixed(1)}%<small>of the way to the top</small></div>
+    <div class="m">gap ${gapOf(p).toFixed(1)} of ${maxGap().toFixed(1)}</div>
+    <div class="m">(${on.map(a=>val(p,a)).join(', ')})</div>`
+    + (months()>0 ? (()=>{ const g=ghostOf(p), r=reachOf(g), d=r-reachOf(p);
+        return `<div class="m" style="color:#f6c85f;margin-top:8px">อีก ${months()} เดือน → ${r.toFixed(1)}% (${d>=0?'+':''}${d.toFixed(1)})</div>
+                <div class="m">(${on.map(a=>Math.round(g.vals[a.id])).join(', ')})</div>`; })() : '');
+}
+function renderHint(){
+  const d=drawnAxes().length;
+  $('hint').textContent = d>=3 ? (S.surface?'click the surface to add a point':'turn on the equal-reach surface to add points by clicking')
+                               : 'click inside the square to add a point';
+  if(d===1) $('hint').textContent='click on the line to add a point';
+  const m=mode(), n=onAxes().length;
+  if(m==='radar') $('hint').textContent='hover a dot to read its value';
+  if(m==='sphere') $('hint').textContent='drag to rotate · scroll to zoom · hover a dot to read its value';
+  $('gSurf').style.display=m==='cube'?'flex':'none';
+  $('gCam').style.display=m==='cube'||m==='sphere'?'flex':'none';
+  $('gAlt').style.display=n>=3?'flex':'none';
+  $('alt').textContent=n===3?'Radar view':'Sphere view';
+  $('alt').classList.toggle('on',n===3?!!S.alt3:!!S.alt4);
+  $('surf').classList.toggle('on',S.surface);
+}
+let lastKey='';
+function afterAxesChange(){ save(); renderAll(); }
+function renderAll(){
+  if(!onAxes().length) S.axes[0].on=true;
+  S.axes.forEach(a=>S.points.forEach(p=>{ if(p.vals[a.id]==null) p.vals[a.id]=50; }));
+  renderAxes(); renderDimBtns(); renderPoints(); renderInfo(); renderHint(); build();
+  const key=mode()+drawnAxes().length; if(key!==lastKey){ lastKey=key; setView(); }
+}
+
+// ---------- actions ----------
+$('addAxis').onclick=()=>{
+  if(S.axes.length>=MAX_AXES) return;
+  const used=S.axes.map(a=>a.color), color=AX_COLORS.find(c=>!used.includes(c))||AX_COLORS[S.axes.length%8];
+  const a={id:uid(),name:'axis '+(S.axes.length+1),color,on:true}; S.axes.push(a);
+  S.points.forEach(p=>p.vals[a.id]=50); save(); renderAll();
+  const inp=[...document.querySelectorAll('#axes .name')].pop(); inp?.focus(); inp?.select();
+};
+function addPoint(vals){
+  const n=S.points.length+1, used=S.points.map(p=>p.color);
+  const p={id:uid(),name:'point '+n,color:PT_COLORS.find(c=>!used.includes(c))||PT_COLORS[n%8],vals:Object.fromEntries(S.axes.map(a=>[a.id,vals?.[a.id]??50]))};
+  S.points.push(p); S.sel=p.id; save(); renderAll(); return p;
+}
+$('addPoint').onclick=()=>addPoint();
+$('save').onclick=savePNG;
+const mIn=$('months');
+function paintMonths(){ mIn.value=months(); mIn.style.setProperty('--p',months()/24*100+'%'); $('mLbl').textContent=months()?`+${months()} เดือน`:'ตอนนี้'; }
+mIn.oninput=()=>{ S.months=+mIn.value; paintMonths(); save(); build(); renderInfo(); if(S.tab==='time') renderPoints(); };
+paintMonths();
+$('surf').onclick=()=>{ S.surface=!S.surface; save(); renderHint(); build(); };
+$('alt').onclick=()=>{ if(onAxes().length===3) S.alt3=!S.alt3; else S.alt4=!S.alt4; $('tip').style.display='none'; save(); renderAll(); };
+$('orbit').onclick=()=>{ if(!controls.enableRotate) return; controls.autoRotate=!controls.autoRotate; $('orbit').classList.toggle('on',controls.autoRotate); };
+$('reset').onclick=()=>{ controls.autoRotate=false; $('orbit').classList.remove('on'); setView(); };
+controls.addEventListener('start',()=>{ if(controls.autoRotate){ controls.autoRotate=false; $('orbit').classList.remove('on'); } });
+
+// click to add a point
+const ray=new THREE.Raycaster(), ndc=new THREE.Vector2(); let down=null;
+const cv=renderer.domElement;
+cv.addEventListener('pointerdown',e=>{ down={x:e.clientX,y:e.clientY,t:performance.now()}; });
+cv.addEventListener('pointerup',e=>{
+  if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>4||performance.now()-down.t>500){ down=null; return; } down=null;
+  const r=cv.getBoundingClientRect(); ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1); ray.setFromCamera(ndc,camera);
+  if(mode()==='sphere') return;
+  const dr=drawnAxes(), d=dr.length, base=Object.fromEntries(S.axes.map(a=>[a.id,val(sel(),a)])), toV=x=>clamp(x/SIZE*100);
+  if(d>=3){
+    if(!S.surface||!surfaceMesh) return;
+    const hit=ray.intersectObject(surfaceMesh,false).find(h=>[h.point.x,h.point.y,h.point.z].every(c=>c>=-.01&&c<=SIZE+.01));
+    if(!hit) return; dr.forEach((a,i)=>base[a.id]=toV([hit.point.x,hit.point.y,hit.point.z][i]));
+    addPoint(base);
+  } else {
+    const hit=ray.intersectObject(flatPlane,false)[0]; if(!hit) return; const {x,y}=hit.point;
+    if(x<-.2||x>SIZE+.2) return;
+    if(d===2){ if(y<-.2||y>SIZE+.2) return; base[dr[1].id]=toV(y); } else if(Math.abs(y)>1.8) return;
+    base[dr[0].id]=toV(x); addPoint(base);
+  }
+});
+
+const tip=$('tip');
+function showTip(e){
+  if(e.target.closest('#bar,#info')){ tip.style.display='none'; return; }
+  const r=view.getBoundingClientRect(), x=e.clientX-r.left, y=e.clientY-r.top; let h=null;
+  if(isRadar()){ let bd=14; for(const it of radarHits){ const dd=Math.hypot(it.x-x,it.y-y); if(dd<bd){ bd=dd; h=it; } } }
+  else if(hoverables.length){
+    ndc.set(x/r.width*2-1,-(y/r.height)*2+1); ray.setFromCamera(ndc,camera);
+    h=ray.intersectObjects(hoverables,false)[0]?.object.userData||null;
+  }
+  if(!h){ tip.style.display='none'; return; }
+  tip.innerHTML=h.a ? `<b style="color:${h.p.color}">${esc(h.p.name)}</b> · <span style="color:${h.a.color}">${esc(h.a.name)}</span> <b>${h.v}</b>`
+                    : `<b style="color:${h.p.color}">${esc(h.p.name)}</b> (${onAxes().map(a=>val(h.p,a)).join(', ')}) · ${reachOf(h.p).toFixed(1)}%`;
+  tip.style.display='block';
+  tip.style.left=Math.max(8,Math.min(x+14,r.width-tip.offsetWidth-8))+'px'; tip.style.top=(y+16)+'px';
+}
+view.addEventListener('pointermove',e=>{ if(e.pointerType!=='touch') showTip(e); });
+view.addEventListener('pointerdown',e=>{ if(e.pointerType==='touch') showTip(e); });
+view.addEventListener('pointerleave',()=>tip.style.display='none');
+
+function resize(){ const w=view.clientWidth,h=view.clientHeight; renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); if(isRadar()) drawRadarScreen(); }
+addEventListener('resize',resize); resize();
+renderAll();
+document.fonts?.ready.then(()=>build());
+
+const clock=new THREE.Clock();
+(function loop(){ requestAnimationFrame(loop);
+  const t=clock.getElapsedTime(), tp=dyn.getObjectByName('top'); if(tp) tp.rotation.y=t*1.2;
+  controls.update(); renderer.render(scene,camera); })();
+</script>
+</body>
+</html>
